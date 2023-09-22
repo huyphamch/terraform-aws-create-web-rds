@@ -268,9 +268,7 @@ resource "aws_instance" "web-windows" {
   user_data = <<-EOF
 <powershell>
 Install-WindowsFeature -name Web-Server -IncludeManagementTools
-$os = systeminfo | findstr /B /C:"OS Name“
-$ipAddress = Resolve-DnsName $env:COMPUTERNAME -Type A | Select -Property IPAddress 
-New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value  "Hello World from $ipAddress running on $os" -Force
+New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value "Hello World Page running on Windows Server" -Force
 </powershell>
 EOF
 
