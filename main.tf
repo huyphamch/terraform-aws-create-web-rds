@@ -18,10 +18,20 @@ resource "aws_vpc" "vpc-load-balancer" {
 resource "aws_subnet" "subnet-public" {
   vpc_id = aws_vpc.vpc-load-balancer.id
   availability_zone = "us-east-1a"
-  cidr_block = "10.0.0.0/27"
+  cidr_block = "10.0.0.0/28"
   map_public_ip_on_launch = true
   tags = {
         Name = "subnet-public"
+  }
+}
+
+resource "aws_subnet" "subnet-public2" {
+  vpc_id = aws_vpc.vpc-load-balancer.id
+  availability_zone = "us-east-1b"
+  cidr_block = "10.0.0.16/28"
+  map_public_ip_on_launch = true
+  tags = {
+        Name = "subnet-public2"
   }
 }
 
@@ -95,6 +105,17 @@ resource "aws_route_table" "rt-public"{
   }
 }
 
+resource "aws_route_table" "rt-public2"{
+  vpc_id = aws_vpc.vpc-load-balancer.id
+  route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway.igw-web.id
+  }
+  tags = {
+      Name = "rt-public2"
+  }
+}
+
 resource "aws_route_table" "rt-private"{
   vpc_id = aws_vpc.vpc-load-balancer.id
   route {
@@ -123,15 +144,25 @@ resource "aws_route_table_association" "rta-public"{
   route_table_id = aws_route_table.rt-public.id
 }
 
+resource "aws_route_table_association" "rta-publi2"{
+  subnet_id = aws_subnet.subnet-public2.id
+  route_table_id = aws_route_table.rt-public2.id
+}
+
 resource "aws_route_table_association" "rta-private"{
   subnet_id = aws_subnet.subnet-private.id
   route_table_id = aws_route_table.rt-private.id
 }
 
+resource "aws_route_table_association" "rta-private2"{
+  subnet_id = aws_subnet.subnet-private2.id
+  route_table_id = aws_route_table.rt-private2.id
+}
+
 # 8. Create security group to allow port: Http, Https, SSH, RDP
 resource "aws_security_group" "security-group-web" {
   name        = "Allow_inbound_traffic"
-  description = "Allow https, http, ssh inbound traffic"
+  description = "Allow https, http, ssh and rdp inbound traffic"
   vpc_id      = aws_vpc.vpc-load-balancer.id
 
   ingress {
@@ -154,6 +185,14 @@ resource "aws_security_group" "security-group-web" {
     description      = "SSH"
     from_port        = 22
     to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description      = "RDP"
+    from_port        = 3389
+    to_port          = 3389
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
   }
@@ -200,7 +239,6 @@ resource "aws_instance" "web-linux" {
   ami = "ami-03a6eaae9938c858c"
   instance_type = "t2.micro"
   key_name = aws_key_pair.key_pair.key_name
-  availability_zone = "us-east-1a"
   subnet_id     = aws_subnet.subnet-public.id
   vpc_security_group_ids =  [ aws_security_group.security-group-web.id ]
 
@@ -211,6 +249,7 @@ sudo yum install -y httpd.x86_64
 sudo yum install git -y
 sudo systemctl start httpd.service
 sudo systemctl enable httpd.service
+echo "Hello World from $(hostname -f) running on $(uname -r)" > /var/www/html/index.html
 EOF
 
   tags = {
@@ -223,14 +262,15 @@ resource "aws_instance" "web-windows" {
   ami = "ami-0be0e902919675894"
   instance_type = "t2.micro"
   key_name = aws_key_pair.key_pair.key_name
-  availability_zone = "us-east-1a"
-  subnet_id     = aws_subnet.subnet-public.id
+  subnet_id     = aws_subnet.subnet-public2.id
   vpc_security_group_ids =  [ aws_security_group.security-group-web.id ]
 
   user_data = <<-EOF
 <powershell>
 Install-WindowsFeature -name Web-Server -IncludeManagementTools
-New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value "Hello World Page" -Force
+$os = systeminfo | findstr /B /C:"OS Name“
+$ipAddress = Resolve-DnsName $env:COMPUTERNAME -Type A | Select -Property IPAddress 
+New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value  "Hello World from $ipAddress running on $os" -Force
 </powershell>
 EOF
 

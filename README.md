@@ -29,3 +29,22 @@ Then the RDS database supporting multi availability zones is created in a privat
 Http requests a forwarded from the Internet Gateway to the EC2 instances which can access the data from the RDS database and send the response via Internet Gateway to the client.
 
 <br />The manual steps to achieve the same result using the AWS management console are documented [here](https://github.com/huyphamch/terraform-aws-create-web-rds/blob/master/manual/Project1.pdf)
+
+## Prerequisites
+<br /> You have access to AWS services, for example via Free tier AWS account.
+<br /> AWS CLI and Terraform are already installed.
+
+## Usage
+<br /> 1. Open terminal
+<br /> 2. Before you can execute the terraform script, your need to configure your aws environment first.
+<br /> aws configure
+<br /> AWS Access Key ID: See IAM > Security credentials > Access keys > Create access key
+<br /> AWS Secret Access Key: See IAM > Security credentials > Access keys > Create access key
+<br /> Default region name: us-east-1
+<br /> Default output format: json
+<br /> 3. Now you can apply the terraform changes.
+<br /> terraform init
+<br /> terraform apply --auto-approve
+<br /> Result: Calling the URL from the web browser should display the static web page
+<br /> 4. At the end you can cleanup the created AWS resources.
+<br /> terraform destroy --auto-approve
