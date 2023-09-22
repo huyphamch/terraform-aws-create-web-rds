@@ -28,4 +28,4 @@ You are expected to provide step-by-step instructions for creating and configuri
 Then the RDS database supporting multi availability zones is created in a private subnet to only allow data access from the EC2 instances within the security group.
 Http requests a forwarded from the Internet Gateway to the EC2 instances which can access the data from the RDS database and send the response via Internet Gateway to the client.
 
-<br />The manual steps to achieve the same result using the AWS management console are documented [here](https://github.com/huyphamch/terraform-aws-create-web-rds/blob/master/manual/Creating a VPC with Database and EC2 Instances.pdf)
+<br />The manual steps to achieve the same result using the AWS management console are documented [here](https://github.com/huyphamch/terraform-aws-create-web-rds/blob/master/manual/Project1.pdf)
