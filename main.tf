@@ -92,7 +92,7 @@ resource "aws_route" "outcoming-route" {
   gateway_id             = aws_nat_gateway.nat_gateway.id
 }
 
-# 7. Assign subnet to route table
+# 8. Assign subnet to route table
 resource "aws_route_table_association" "public" {
   count          = length(var.subnet_cidr_public)
   subnet_id      = element(aws_subnet.subnet-public.*.id, count.index)
@@ -105,7 +105,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.rt-private.id
 }
 
-# 8. Create security group to allow port: Http, Https, SSH, RDP
+# 9. Create security group to allow port: Http, Https, SSH, RDP
 resource "aws_security_group" "security-group-web" {
   name        = "Allow_inbound_traffic"
   description = "Allow https, http, ssh and rdp inbound traffic"
@@ -180,7 +180,7 @@ resource "aws_security_group" "security-group-database" {
   }
 }
 
-# 9.a Create Amazon Linux-Apache2 EC2-instance
+# 10.1 Create Amazon Linux-Apache2 EC2-instances
 resource "aws_instance" "web-linux" {
   count         = length(var.subnet_cidr_public)
   ami           = "ami-03a6eaae9938c858c"
@@ -197,7 +197,7 @@ resource "aws_instance" "web-linux" {
   }
 }
 
-# 9.b Create Windows-IIS EC2-instance
+# 10.2 Create Windows-IIS EC2-instances
 resource "aws_instance" "web-windows" {
   count         = length(var.subnet_cidr_public)
   ami           = "ami-0be0e902919675894"
@@ -214,13 +214,14 @@ resource "aws_instance" "web-windows" {
   }
 }
 
-# 10. Create a RDS Database Instance
+# 11. Create Database Subnet Group
 resource "aws_db_subnet_group" "db-subnet-group-mysql" {
   name       = "db-subnet-group-mysql"
   subnet_ids = aws_subnet.subnet-private.*.id
 }
 
 /* 
+* 12. Create a RDS Database Instance
 * allocated_storage: This is the amount in GB
 * storage_type: Type of storage we want to allocate(options avilable "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD)
 * engine: Database engine(for supported values check https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html) eg: Oracle, Amazon Aurora,Postgres 
