@@ -5,13 +5,13 @@ variable "subnet_cidr_public" {
 }
 
 variable "subnet_cidr_private" {
-  description = "cidr blocks for the public subnets"
+  description = "cidr blocks for the private subnets"
   default     = ["10.20.20.32/28", "10.20.20.48/28"]
   type        = list(any)
 }
 
 variable "availability_zone" {
-  description = "availability zones for the public subnets"
+  description = "availability zones for the subnets"
   default     = ["us-east-1a", "us-east-1b"]
   type        = list(any)
 }
