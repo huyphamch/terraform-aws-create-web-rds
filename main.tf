@@ -7,7 +7,7 @@
 
 # 1. Create VPC
 resource "aws_vpc" "vpc-cloud-fundamentals" {
-  cidr_block = "10.20.20.0/26"
+  cidr_block = var.vpc_cidr
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc#enable_dns_support
   enable_dns_support = true
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc#enable_dns_hostnames

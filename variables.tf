@@ -1,3 +1,8 @@
+variable "vpc_cidr" {
+  description = "cidr for vpc"
+  default     = "10.20.20.0/26"
+  type        = string
+}
 variable "subnet_cidr_public" {
   description = "cidr blocks for the public subnets"
   default     = ["10.20.20.0/28", "10.20.20.16/28"]
